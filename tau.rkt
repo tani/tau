@@ -12,6 +12,7 @@
 
 (define (typeq? t s)
   (or (member 'any (list t s))
+      (member 'unknown (list t s))
       (equal? t s)
       (and (list? t)
            (list? s)
@@ -19,13 +20,13 @@
 
 (define/match (typeof exp types)
   [(`(FUN ,ftype ,args ,@body) _)
-   (let* ([atypes (drop-right ftype 1)]
+   (let* ([atypes (drop-right ftype 2)]
           [types (append (zip args atypes) types)]
           [rtype (last ftype)]
           [btype (for/and ([exp body]) (typeof exp types))])
      (unless (typeq? rtype btype)
        (raise "An invalid return was found"))
-     (append atypes (list btype)))]
+     `(,@atypes -> ,(if (equal? rtype 'unknown) btype rtype)))]
   [(`(IF ,test ,then ,else) _)
    (let ([testtype (typeof test types)]
          [thentype (typeof then types)]
@@ -37,13 +38,13 @@
    (let ([vartype (typeof var types)]
          [valtype (typeof val types)])
      (unless (typeq? vartype valtype)
-       (raise "An invalid assignment was found"))
+       (error "An invalid assignment was found: " vartype " is expected but " valtype))
      vartype)]
   [(`(APP ,fun ,@args) _)
    (let* ([atypes (map (lambda (arg) (typeof arg types)) args)]
           [ftype (typeof fun types)]
           [rtype (last ftype)]
-          [etypes (drop-right ftype 1)])
+          [etypes (drop-right ftype 2)])
      (unless (typeq? atypes etypes)
        (raise "An invalid application was found"))
      rtype)]
@@ -59,7 +60,7 @@
 
 (define/match (transform-local exp)
   [(`(let (((,vars ,types) ,vals) ...) ,@body))
-   `(APP (FUN (,@types any) ,vars ,@(map transform-local body))
+   `(APP (FUN (,@types -> unknown) ,vars ,@(map transform-local body))
          ,@(map transform-local vals))]
   [(`(letrec (((,vars ,types) ,vals) ...) ,@body))
    (transform-local
@@ -97,21 +98,21 @@
   [(_) exp])
 
 (define types
-  `((+ (number number number))
-    (- (number number number))
-    (* (number number number))
-    (/ (number number number))
-    (> (number number bool))
-    (< (number number bool))
-    (= (number number bool))
-    (>= (number number bool))
-    (<= (number number bool))
+  `((+ (number number -> number))
+    (- (number number -> number))
+    (* (number number -> number))
+    (/ (number number -> number))
+    (> (number number -> bool))
+    (< (number number -> bool))
+    (= (number number -> bool))
+    (>= (number number -> bool))
+    (<= (number number -> bool))
     (,undefined any)
-    (read (any))
-    (display (any unit))
-    (cons (any any cons))
-    (car (cons any))
-    (cdr (cons any))))
+    (read (-> any))
+    (display (any -> unit))
+    (cons (any any -> cons))
+    (car (cons -> any))
+    (cdr (cons -> any))))
 
 (define (exec exps)
   (let ((exp (apply transform-local (transform-global exps))))
