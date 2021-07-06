@@ -26,7 +26,7 @@
           [btype (for/and ([exp body]) (typeof exp types))])
      (unless (typeq? rtype btype)
        (raise "An invalid return was found"))
-     `(,@atypes -> ,(if (equal? rtype 'unknown) btype rtype)))]
+     `[,@atypes -> ,(if (equal? rtype 'unknown) btype rtype)])]
   [(`(IF ,test ,then ,else) _)
    (let ([testtype (typeof test types)]
          [thentype (typeof then types)]
@@ -58,13 +58,18 @@
   [((? (lambda (u) (eq? u undefined))) _) 'any]
   [(_ _) (raise "Error")])
 
+(define/match (transform-type t)
+  [(`[,@atypes -> ,rtypes]) t]
+  [(`[,type]) type]
+  [(_) (raise t)])
+
 (define/match (transform-local exp)
-  [(`(let (((,vars ,types) ,vals) ...) ,@body))
-   `(APP (FUN (,@types -> unknown) ,vars ,@(map transform-local body))
+  [(`(let ((,vars ,(app transform-type types) ,vals) ...) ,@body))
+   `(APP (FUN [,@types -> unknown] ,vars ,@(map transform-local body))
          ,@(map transform-local vals))]
-  [(`(letrec (((,vars ,types) ,vals) ...) ,@body))
+  [(`(letrec ((,vars ,(app transform-type types) ,vals) ...) ,@body))
    (transform-local
-    `(let ,(map (lambda (var type) `((,var ,type) ,undefined)) vars types)
+    `(let ,(map (lambda (var type) `(,var ,type ,undefined)) vars types)
        ,@(map (lambda (var val) `(set! ,var ,val)) vars vals)
        ,@body))]
   [(`(set! ,var ,val))
@@ -80,8 +85,8 @@
   [(_) exp])
 
 (define/match (transform-global exps)
-  [(`((define (,var ,type) ,val) ,@rest))
-   `((letrec (((,var ,type) ,val)) ,@(transform-global rest)))]
+  [(`((define ,var ,type ,val) ,@rest))
+   `((letrec ((,var ,type ,val)) ,@(transform-global rest)))]
   [(`(,head ,@tail))
    `(,head ,@(transform-global tail))]
   [('()) '()])
