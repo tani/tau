@@ -1,7 +1,7 @@
 #lang s-exp "tau.rkt"
 
-(define (sum (number number))
-  (lambda (number number) (n)
+(define (sum (number -> number))
+  (lambda (number -> number) (n)
     (if (> n 0)
         (+ n (sum (- n 1)))
         0)))
