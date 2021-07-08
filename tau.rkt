@@ -40,7 +40,7 @@
      (unless (typeq? vartype valtype)
        (error "An invalid assignment was found: " vartype " is expected but " valtype))
      vartype)]
-  [(`(APP ,fun ,@args) _)
+  [(`(,fun ,@args) _)
    (let* ([atypes (map (lambda (arg) (typeof arg types)) args)]
           [ftype (typeof fun types)]
           [rtype (last ftype)]
@@ -65,7 +65,7 @@
 
 (define/match (transform-local exp)
   [(`(let ((,vars ,(app transform-type types) ,vals) ...) ,@body))
-   `(APP (FUN [,@types -> unknown] ,vars ,@(map transform-local body))
+   `((FUN [,@types -> unknown] ,vars ,@(map transform-local body))
          ,@(map transform-local vals))]
   [(`(letrec ((,vars ,(app transform-type types) ,vals) ...) ,@body))
    (transform-local
@@ -81,7 +81,7 @@
         ,(transform-local then)
         ,(transform-local else))]
   [(`(,fun ,@args))
-   `(APP ,(transform-local fun) ,@(map transform-local args))]
+   `(,(transform-local fun) ,@(map transform-local args))]
   [(_) exp])
 
 (define/match (transform-global exps)
@@ -94,12 +94,12 @@
 (define/match (compile exp)
   [(`(FUN ,types ,args ,@body))
    `(lambda ,args ,@(map compile body))]
-  [(`(APP ,fun ,@args))
-   `(,(compile fun) ,@(map compile args))]
   [(`(IF ,test ,then ,else))
    `(if ,(compile test) ,(compile then) ,(compile else))]
   [(`(SET ,var ,val))
-   `(set! ,var ,(compile val))]
+   `(begin (set! ,var ,(compile val)) ,var)]
+  [(`(,fun ,@args))
+   `(,(compile fun) ,@(map compile args))]
   [(_) exp])
 
 (define types
