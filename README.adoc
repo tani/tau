@@ -1,3 +1,11 @@
+++++
+<div align="center">
+<h1>TauLISP <small>by @tani</small></h1>
+<a href="https://github.com/tani/tau">🌟 GitHub Star</a>
+<a href="https://github.com/sponsors/tani">❤️ GitHub Sponsors</a>
+</div>
+++++
+
 == 概要
 
 このプロジェクトは単純型付きラムダ計算の型理論に基づいた LISPの開発である．
