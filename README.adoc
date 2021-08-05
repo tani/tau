@@ -1,3 +1,5 @@
+:stem: latex
+
 ++++
 <div align="center">
 <h1>TauLISP <small>by @tani</small></h1>
@@ -19,13 +21,28 @@
 この二つの句を繋いでいるのは「たら」という助動詞「た」の仮定形である．
 このとき仮定形は仮定(前節)が成立するとき結論(後節)が成立することを意味する表現である．
 
-ところで，この仮定形を抽象的に表現すると仮定を `A` ，結論を `B` ，
-助動詞を `->` で表して `A -> B` と書く． これを「 `A` ならば `B` 」と読む．
-このとき， `A -> B` に対して `A` が成立することで `B` が成立することを `A, A -> B |- B` と書く．
-冒頭の例に戻ると，まず「明日晴れたら海に行こう(`A -> B`)」という文に対して「明日晴れる(`A`)」が成立することで，
-「海に行く(`B`)」が成立するので， `A, A -> B |- B` と書ける．
-
-このように， `A` と `A -> B` から `B` を成立させることを論理学ではモーダスポーネンスと言う．
+ところで，この仮定形を抽象的に表現すると仮定を stem:[A] ，結論を stem:[B] ，
+助動詞を stem:[\rightarrow] で表して stem:[A\rightarrow B] と書く． これを「 stem:[A] ならば stem:[B] 」と読む．
+このとき， stem:[A\rightarrow B] に対して stem:[A] が成立することで stem:[A] が成立することを 以下のように書く．
+[stem]
+++++
+\begin{prooftree}
+\AXC{A}
+\AXC{\(A\rightarrow B\)}
+\BIC{B}
+\end{prooftree}
+++++
+冒頭の例に戻ると，まず「明日晴れたら海に行こうstem:[A\rightarrow B]」という文に対して「明日晴れる stem:[A]」が成立することで，
+「海に行く stem:[B]」が成立するので， 上記の図が書ける．
+[stem]
+++++
+\begin{prooftree}
+\AXC{明日晴れる : A}
+\AXC{明日晴れたら海に行こう : \(A\rightarrow B\)}
+\BIC{海に行く : B}
+\end{prooftree}
+++++
+このように， stem:[A] と stem:[A\rightarrow B] から stem:[B] を成立させることを論理学ではモーダスポーネンスと言う．
 
 == プログラミング言語 tasm
 
@@ -94,23 +111,38 @@ tasm は無名関数を作れる．特に関数は型宣言を持つ．
 
 == tasm の型検査
 
-まずは簡単な例 `(+ 1 2)` の型検査を考える． `+` の型は `(number number -> number)`
-として二つの `number` 型の値を受け取り `number` 型の値を返すような型である．
-そして，`1` と `2` はどちらも `number` 型であるから，この関数呼び出しは正しいことが言える．
-このとき組 `number number` と _ならば_ の式 `(number number -> number)` を受け取ることで，モーダスポーネンス
-が成立し 結論 `number` を得ているとみなすことができる．
+まずは簡単な例 `(+ 1 2)` の型検査を考える． `+` の型は stem:[number\,number \rightarrow number]
+として二つの stem:[number] 型の値を受け取り stem:[number] 型の値を返すような型である．
+そして，`1` と `2` はどちらも stem:[number] 型であるから，この関数呼び出しは正しいことが言える．
+このとき組 stem:[number\,number] と _ならば_ の式 stem:[number\,number \rightarrow number] を受け取ることで，モーダスポーネンス
+が成立し 結論 stem:[number] を得ているとみなすことができる．
 
-....
-number number, (number number -> number) |- number
-....
+[stem]
+++++
+\begin{prooftree}
+\AXC{1 : number}
+\AXC{2 : number}
+\AXC{+ : \(number\,number \rightarrow number\)}
+\TIC{(+ 1 2) : number}
+\end{prooftree}
+++++
 
 では，少し複雑な例 `(+ 1 (+ 2 3))` はどうであろうか．
 まず，この型が正しいとすると，関数の型を `F`，引数の型をそれぞれ `X` と `Y` として
 戻り値の型を `Z` と置くと，次のモーダスポーネンスが成り立つ．
 
-....
-X Y, F |- Z
-....
+[stem]
+++++
+\begin{prooftree}
+\AXC{1 : number}
+\AXC{2 : number}
+\AXC{3 : number}
+\AXC{+ : \(number\,number \rightarrow number\)}
+\TIC{(+ 2 3): number}
+\AXC{+ : \(number\,number \rightarrow number\)}
+\TIC{(+ 1 (+ 2 3)) : number}
+\end{prooftree}
+++++
 
 このとき， 関数 `+` と 第一引数 `1` は直ちに分かるので，以下の形を得る．
 

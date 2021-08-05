@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (1.5.8)
+    asciidoctor-mathjax3 (0.0.1)
+      asciidoctor (>= 1.5.7, < 2.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asciidoctor
+  asciidoctor-mathjax3
+
+BUNDLED WITH
+   2.1.4
