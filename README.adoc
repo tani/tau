@@ -88,8 +88,8 @@ tasm は無名関数を作れる．特に関数は型宣言を持つ．
 
 [source,lisp]
 ....
-(FUN (number number -> number) (x y) (APP + x y))
-((FUN (number number -> number) (x y) (APP + x y)) 1 2)
+(FUN (number number -> number) (x y) (+ x y))
+((FUN (number number -> number) (x y) (+ x y)) 1 2)
 ....
 
 形式的な定義は以下の通りである． ここで `*` は 0回以上の繰り返しを表わしている．
@@ -128,8 +128,7 @@ tasm は無名関数を作れる．特に関数は型宣言を持つ．
 ++++
 
 では，少し複雑な例 `(+ 1 (+ 2 3))` はどうであろうか．
-まず，この型が正しいとすると，関数の型を `F`，引数の型をそれぞれ `X` と `Y` として
-戻り値の型を `Z` と置くと，次のモーダスポーネンスが成り立つ．
+以下の図から正しくモーダスポーネンスが成立していることが示せる。
 
 [stem]
 ++++
@@ -144,33 +143,32 @@ tasm は無名関数を作れる．特に関数は型宣言を持つ．
 \end{prooftree}
 ++++
 
-このとき， 関数 `+` と 第一引数 `1` は直ちに分かるので，以下の形を得る．
+このように関数の適用だけのプログラムは簡単に型の検査が行える。
+他方で代入と条件分岐は以下のように型付けられる。
 
-....
-number Y, (number number -> number) |- number
-....
+[stem]
+++++
+\begin{prooftree}
+\AXC{test : B}
+\AXC{then : T}
+\AXC{else : T}
+\TIC{(IF test then else) : T}
+\end{prooftree}
+++++
 
-では，以上のモーダスポーネンスが整理するためには `Y` は `number` であることが
-期待される．そこで，第二引数について，どのようなモーダスポーネンスが
+[stem]
+++++
+\begin{prooftree}
+\AXC{var : symbol}
+\AXC{val : T}
+\BIC{(SET var val) : T}
+\end{prooftree}
+++++
 
-以上のように，型検査では与えられたコードに対して対応する証明図を見つけることで
-その型の整合性を判定することができる．今までは関数呼び出しに限定して，
-その型検査の方法を示したが，tasmの他の構文はどうだろう．
-
-....
-X Y, F |- Z
- Y, F |- Z
-U V, (number number -> number) |- Y
-number number, (number number -> number) |- Y
-number number, (number number -> number) |- number
-number number, (number number -> number) |- Z
-number number, (number number -> number) |- number
-....
 
 == プログラミング言語 tau
 
 == tau から tasm への翻訳
-
 
 == tasm から Racket へ翻訳
 
