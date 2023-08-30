@@ -21,22 +21,21 @@
 助動詞を $\rightarrow$ で表して $A\rightarrow B$ と書く． これを「 $A$ ならば $B$ 」と読む．
 このとき， $A\rightarrow B$ に対して $A$ が成立することで $A$ が成立することを 以下のように書く．
 
-$$
-\begin{prooftree}
-\AXC{A}
+$$\begin{prooftree}
+\AXC{$A$}
 \AXC{$A\rightarrow B$}
-\BIC{B}
-\end{prooftree}
-$$
+\BIC{$B$}
+\end{prooftree}$$
+
 冒頭の例に戻ると，まず「明日晴れたら海に行こう$A\rightarrow B$」という文に対して「明日晴れる $A$」が成立することで，
 「海に行く $B$」が成立するので， 上記の図が書ける．
-$$
-\begin{prooftree}
-\AXC{明日晴れる : A}
-\AXC{明日晴れたら海に行こう : \(A\rightarrow B\)}
-\BIC{海に行く : B}
-\end{prooftree}
-$$
+
+$$\begin{prooftree}
+\AXC{$明日晴れる : A$}
+\AXC{$明日晴れたら海に行こう : A\rightarrow B$}
+\BIC{$海に行く : B$}
+\end{prooftree}$$
+
 このように， $A$ と $A\rightarrow B$ から $B$ を成立させることを論理学ではモーダスポーネンスと言う．
 
 ## プログラミング言語 tasm
@@ -102,56 +101,49 @@ tasm は無名関数を作れる．特に関数は型宣言を持つ．
 
 ## tasm の型検査
 
-まずは簡単な例 `(+ 1 2)` の型検査を考える． `+` の型は $number\,number \rightarrow number$
+まずは簡単な例 `(+ 1 2)` の型検査を考える． `+` の型は $number\ number \rightarrow number$
 として二つの $number$ 型の値を受け取り $number$ 型の値を返すような型である．
 そして，`1` と `2` はどちらも $number$ 型であるから，この関数呼び出しは正しいことが言える．
-このとき組 $number\,number$ と _ならば_ の式 $number\,number \rightarrow number$ を受け取ることで，モーダスポーネンス
+このとき組 $number\ number$ と _ならば_ の式 $number\ number \rightarrow number$ を受け取ることで，モーダスポーネンス
 が成立し 結論 $number$ を得ているとみなすことができる．
 
-$$
-\begin{prooftree}
-\AXC{1 : number}
-\AXC{2 : number}
-\AXC{$+ : number\,number \rightarrow number$}
+
+$$\begin{prooftree}
+\AXC{\texttt{1} : $number$}
+\AXC{\texttt{2} : $number$}
+\AXC{\texttt{+} : $number\ number \rightarrow number$}
 \TIC{(+ 1 2) : number}
-\end{prooftree}
-$$
+\end{prooftree}$$
 
 では，少し複雑な例 `(+ 1 (+ 2 3))` はどうであろうか．
 以下の図から正しくモーダスポーネンスが成立していることが示せる。
 
 
-$$
-\begin{prooftree}
+$$\begin{prooftree}
 \AXC{1 : number}
 \AXC{2 : number}
 \AXC{3 : number}
-\AXC{$+ : number\,number \rightarrow number$}
+\AXC{$+ : number\ number \rightarrow number$}
 \TIC{(+ 2 3): number}
-\AXC{$+ : number\,number \rightarrow number$}
+\AXC{$+ : number\ number \rightarrow number$}
 \TIC{(+ 1 (+ 2 3)) : number}
-\end{prooftree}
-$$
+\end{prooftree}$$
 
 このように関数の適用だけのプログラムは簡単に型の検査が行える。
 他方で代入と条件分岐は以下のように型付けられる。
 
-$$
-\begin{prooftree}
-\AXC{$\texttt{test} : boolean$}
-\AXC{$\texttt{then} : \mathcal{T}$}
-\AXC{$\texttt{else} : \mathcal{T}$}
-\TIC{$\texttt{(IF\, test then else)} : \mathcal{T}$}
-\end{prooftree}
-$$
+$$\begin{prooftree}
+\AXC{\texttt{test} : $boolean$}
+\AXC{\texttt{then} : $\mathcal{T}$}
+\AXC{\texttt{else} : $\mathcal{T}$}
+\TIC{\texttt{(IF\ test\ then\ else)} : $\mathcal{T}$}
+\end{prooftree}$$
 
-$$
-\begin{prooftree}
+$$\begin{prooftree}
 \AXC{var : symbol}
 \AXC{val : T}
 \BIC{(SET var val) : T}
-\end{prooftree}
-$$
+\end{prooftree}$$
 
 ## プログラミング言語 tau
 
